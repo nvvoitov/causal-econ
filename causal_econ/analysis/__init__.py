@@ -1,10 +1,10 @@
-from .summary_analysis import (
+from .summary import (
     create_standardized_summary_table,
     combine_method_summaries,
     create_method_comparison_table,
     export_summary_tables
 )
-from .impact_analysis import (
+from .impact import (
     create_impact_table,
     create_country_impact_details,
     create_cross_method_impact_comparison,

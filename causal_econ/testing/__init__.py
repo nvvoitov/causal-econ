@@ -1,4 +1,4 @@
-from .testing_placebo import (
+from .testing import (
     PlaceboTest, 
     run_unified_placebo_test, 
     run_placebo_battery,
