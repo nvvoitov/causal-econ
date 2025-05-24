@@ -6,8 +6,8 @@ with open("README.md", "r", encoding="utf-8") as fh:
 setup(
     name="causal-econ",
     version="0.1.0",
-    author="Your Name",
-    author_email="your.email@example.com",
+    author="Nikolay Voytov",
+    author_email="not@today.com",
     description="A comprehensive library for causal inference in economic analysis",
     long_description=long_description,
     long_description_content_type="text/markdown",
