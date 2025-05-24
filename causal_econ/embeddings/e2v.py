@@ -225,6 +225,12 @@ def perform_kmeans_clustering(embeddings: np.ndarray,
     --------
     tuple : (cluster_labels, kmeans_model, country_embeddings)
     """
+    # Set thread limit to avoid BLAS issues
+    import os
+    os.environ['OMP_NUM_THREADS'] = '1'
+    os.environ['MKL_NUM_THREADS'] = '1'
+    os.environ['OPENBLAS_NUM_THREADS'] = '1'
+    
     # Calculate country embeddings (average across time)
     unique_countries = np.unique(countries)
     country_embeddings = np.zeros((len(unique_countries), embeddings.shape[1]))
@@ -233,22 +239,17 @@ def perform_kmeans_clustering(embeddings: np.ndarray,
         mask = countries == country
         country_embeddings[i] = np.mean(embeddings[mask], axis=0)
     
-    # Perform K-means clustering with error handling
-    try:
-        kmeans_model = KMeans(n_clusters=n_clusters, random_state=42, n_init=10)
-        cluster_labels = kmeans_model.fit_predict(country_embeddings)
-    except AttributeError as e:
-        if 'NoneType' in str(e) and 'split' in str(e):
-            # BLAS configuration error - use alternative approach
-            print("Warning: BLAS configuration issue detected. Using alternative clustering approach.")
-            import os
-            os.environ['OMP_NUM_THREADS'] = '1'
-            
-            # Try again with single thread
-            kmeans_model = KMeans(n_clusters=n_clusters, random_state=42, n_init=10, algorithm='elkan')
-            cluster_labels = kmeans_model.fit_predict(country_embeddings)
-        else:
-            raise
+    # Use MiniBatchKMeans to avoid threadpool issues
+    from sklearn.cluster import MiniBatchKMeans
+    
+    # Perform clustering
+    kmeans_model = MiniBatchKMeans(
+        n_clusters=n_clusters, 
+        random_state=42, 
+        batch_size=min(100, len(unique_countries)),
+        n_init=10
+    )
+    cluster_labels = kmeans_model.fit_predict(country_embeddings)
     
     return cluster_labels, kmeans_model, country_embeddings
 
