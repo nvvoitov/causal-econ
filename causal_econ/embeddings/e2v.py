@@ -233,9 +233,22 @@ def perform_kmeans_clustering(embeddings: np.ndarray,
         mask = countries == country
         country_embeddings[i] = np.mean(embeddings[mask], axis=0)
     
-    # Perform K-means clustering
-    kmeans_model = KMeans(n_clusters=n_clusters, random_state=42)
-    cluster_labels = kmeans_model.fit_predict(country_embeddings)
+    # Perform K-means clustering with error handling
+    try:
+        kmeans_model = KMeans(n_clusters=n_clusters, random_state=42, n_init=10)
+        cluster_labels = kmeans_model.fit_predict(country_embeddings)
+    except AttributeError as e:
+        if 'NoneType' in str(e) and 'split' in str(e):
+            # BLAS configuration error - use alternative approach
+            print("Warning: BLAS configuration issue detected. Using alternative clustering approach.")
+            import os
+            os.environ['OMP_NUM_THREADS'] = '1'
+            
+            # Try again with single thread
+            kmeans_model = KMeans(n_clusters=n_clusters, random_state=42, n_init=10, algorithm='elkan')
+            cluster_labels = kmeans_model.fit_predict(country_embeddings)
+        else:
+            raise
     
     return cluster_labels, kmeans_model, country_embeddings
 
