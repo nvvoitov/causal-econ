@@ -10,7 +10,17 @@ __author__ = "Nikolay Voytov"
 
 # Core imports
 from .core.data_loader import load_data, preprocess_panel_data
-from .core.base import CausalResults, ModelConfig
+from .core.base import (
+    CausalResults,
+    ModelConfig,
+    DataValidator,
+    calculate_causal_metrics,
+    split_pre_post_periods
+)
+from .core.placebo import PlaceboTestRunner
+from .core.pipeline import CausalAnalysisPipeline, AnalysisRegistry
+from .core.results import ResultsAggregator
+from .core.optimization import WeightOptimizer
 
 # Embeddings
 from .embeddings.e2v import Economic2Vec, generate_geminis, run_e2v_analysis
@@ -34,34 +44,48 @@ from .visualization.counterfactuals import export_counterfactual_plots
 from .visualization.distributions import export_distribution_plots
 
 __all__ = [
-    # Core
+    # Core - Data
     'load_data',
-    'preprocess_panel_data', 
+    'preprocess_panel_data',
+
+    # Core - Base classes
     'CausalResults',
     'ModelConfig',
-    
+    'DataValidator',
+
+    # Core - Utilities
+    'calculate_causal_metrics',
+    'split_pre_post_periods',
+
+    # Core - Pipeline framework (Phase 2)
+    'CausalAnalysisPipeline',
+    'AnalysisRegistry',
+    'PlaceboTestRunner',
+    'ResultsAggregator',
+    'WeightOptimizer',
+
     # Embeddings
     'Economic2Vec',
     'generate_geminis',
     'run_e2v_analysis',
-    
+
     # Donor pools
     'create_donor_pools',
     'get_donor_pools',
-    
+
     # Models
     'run_sc_analysis',
     'run_did_analysis_pipeline',
     'run_sdid_pipeline',
     'run_gsc_analysis',
     'run_causal_e2v_analysis',
-    
+
     # Analysis
     'combine_method_summaries',
     'export_summary_tables',
     'create_impact_table',
     'export_impact_tables',
-    
+
     # Visualization
     'export_counterfactual_plots',
     'export_distribution_plots'
